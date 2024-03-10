@@ -34,7 +34,7 @@ npm run serve
 ![alt text](public/image-1.png)
 
 ## Demo
-[Live Demo](https://social-media-downloader.netlify.app/)
+[Live Demo](https://social-media-downloader-psi.vercel.app/)
 
 
 ## Tools Used
