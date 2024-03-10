@@ -16,12 +16,11 @@ export default function Home() {
       alert('Please enter a valid url')
       return
     }
-    // verify if the url is valid for facebook, youtube, instagram, tiktok
+    // verify if the url is valid for facebook video, youtube video, instagram video, tiktok video
     if (!mediaUrl.includes('facebook') && !mediaUrl.includes('youtube') && !mediaUrl.includes('instagram') && !mediaUrl.includes('tiktok')) {
-      alert('Please enter a valid url')
+      alert('Please enter a valid url for facebook, youtube, instagram, tiktok')
       return
     }
-
     const options = {
       method: 'GET',
       url: 'https://social-media-video-downloader.p.rapidapi.com/smvd/get/all',
