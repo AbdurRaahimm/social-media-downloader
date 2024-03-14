@@ -6,19 +6,23 @@ This is a simple social media video downloader. It can download videos from Face
 ```bash
 git clone https://github.com/AbdurRaahimm/social-media-downloader.git
 ```
-2. Run The Essential Dependency
+2. Go to directory
+```bash
+cd social-media-downloader
+```
+3. Run The Essential Dependency
 ```bash
 npm install
 ```
-3. Run `npm run dev` to start the development server
+4. Run `npm run dev` to start the development server
 ```bash
 npm run dev
 ```
-4. Run `npm run build` to build the project
+5. Run `npm run build` to build the project
 ```bash
 npm run build
 ```
-5. Run `npm run serve` to serve the build
+6. Run `npm run serve` to serve the build
 ```bash
 npm run serve
 ```
