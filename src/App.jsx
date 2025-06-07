@@ -3,8 +3,6 @@ import { RouterProvider, Route, createBrowserRouter, createRoutesFromElements } 
 import Home from "./pages/Home";
 import YtoMp3 from "./pages/YtoMp3";
 import ErrorPage from "./pages/ErrorPage";
-import Clarity from '@microsoft/clarity';
-const projectId = "rv61d21r2n"
 
 
 const router = createBrowserRouter(
@@ -23,10 +21,6 @@ const router = createBrowserRouter(
   )
 );
 export default function App() {
-useEffect(() => {
-    Clarity.init(projectId);
-  }, [])
-
   return (
     <RouterProvider router={router} />
   )
