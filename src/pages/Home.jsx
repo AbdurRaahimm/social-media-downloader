@@ -1,11 +1,13 @@
-import React, { useState } from 'react'
+import  { useState } from 'react'
 import Layout from '../components/Layout'
 import Form from '../components/Form'
-import axios from 'axios'
+import axios from 'axios';
+import {toast} from 'react-toastify';
 
 export default function Home() {
   const [mediaData, setMediaData] = useState();
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const downloadMedia = async (e) => {
     e.preventDefault()
@@ -13,12 +15,12 @@ export default function Home() {
     // console.log(mediaUrl)
     // verify if the url is empty
     if (!mediaUrl) {
-      alert('Please enter a valid url')
+      toast.error('Please enter a valid url')
       return
     }
     // verify if the url is valid for facebook video, youtube video, instagram video, tiktok video
     if (!mediaUrl.includes('facebook') && !mediaUrl.includes('youtube') && !mediaUrl.includes('instagram') && !mediaUrl.includes('tiktok')) {
-      alert('Please enter a valid url for facebook, youtube, instagram, tiktok')
+      toast.error('Please enter a valid url for facebook, youtube, instagram, tiktok')
       return
     }
     const options = {
@@ -38,12 +40,16 @@ export default function Home() {
 
     setLoading(true)
     try {
-      const response = await axios.request(options)
-      setMediaData(response.data)
-      setLoading(false)
+      const response = await axios.request(options);
+      setMediaData(response.data);
+      setLoading(false);
     } catch (error) {
-      console.error(error)
-      setLoading(false)
+      console.error(error);
+      setError('You have exceeded the MONTHLY quota for Requests. Please try again later.');
+      if (error.response.status === 429) {
+        toast.error('Too many requests, please try again later');
+      }
+      setLoading(false);
     }
   };
   return (
@@ -67,6 +73,11 @@ export default function Home() {
               <source src={mediaData.links[0].link} type="video/mp4" />
               Your browser does not support the video tag.
             </video>
+          )}
+          {error && (
+            <div className="text-red-500 text-center">
+              <p>{error}</p>
+            </div>
           )}
         </div>
         {/* title */}
