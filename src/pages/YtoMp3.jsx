@@ -7,6 +7,8 @@ import {
   AlertTriangle,
   Music,
   X,
+  Play,
+  Pause,
 } from "lucide-react";
 import Layout from "../components/Layout";
 import StatusCard from "../components/StatusCard";
@@ -19,6 +21,7 @@ const YToMP3 = () => {
   const [status, setStatus] = useState("idle");
   const [errorMessage, setErrorMessage] = useState("");
   const [videoInfo, setVideoInfo] = useState(null);
+  const [isPlaying, setIsPlaying] = useState(false);
   const [time, setTime] = useState({
     days: 0,
     hours: 0,
@@ -155,18 +158,18 @@ const YToMP3 = () => {
     }
   };
 
-  // const handlePlayPause = () => {
-  //   if (videoInfo?.linkDownload) {
-  //     const audio = new Audio(videoInfo.linkDownload);
-  //     if (audio.paused) {
-  //       audio.play();
-  //     } else {
-  //       audio.pause();
-  //     }
-  //   } else {
-  //     toast.error("No audio available to play. Please convert a video first.");
-  //   }
-  // };
+  const handlePlayPause = () => {
+    if (videoInfo?.linkDownload) {
+      const audio = new Audio(videoInfo?.linkDownload);
+      if (isPlaying) {
+        audio.pause();
+      } else {
+        audio.play()
+        
+      }
+      setIsPlaying((prev) => !prev);
+    }
+  };
 
   const renderStatusContent = () => {
     switch (status) {
@@ -200,16 +203,27 @@ const YToMP3 = () => {
                         : "Unknown"
                     }
                   </p>
-                  {/* <button
-                    onClick={handlePlayPause}
-                    className="mt-2 text-indigo-400 hover:text-indigo-300 transition-colors font-semibold "
-                  >
-                    {videoInfo?.linkDownload ? (
-                      <Play className="w-5 h-5 inline-block" />
+                 
+                  {/* audio play/pause */} 
+
+                  {
+                    isPlaying ? (
+                      <button
+                        onClick={handlePlayPause}
+                        className="mt-2 text-slate-500 hover:text-slate-300 transition-colors"
+                      >
+                        <Pause className="w-5 h-5" />
+                      </button>
                     ) : (
-                      <Pause />
-                    )}
-                  </button> */}
+                      <button
+                        onClick={handlePlayPause}
+                        className="mt-2 text-slate-500 hover:text-slate-300 transition-colors"
+                      >
+                        <Play className="w-5 h-5" />
+                      </button>
+                    )
+                  }
+                  
                 </div>
               </div>
               <button
@@ -301,11 +315,11 @@ const YToMP3 = () => {
               </button>
             </form>
 
-            {/* API Rate Limit */}
+            {/* Download Limit */}
 
             <div className="space-y-2 mt-6 bg-slate-700/50 border border-slate-600 rounded-lg p-4">
               <div className="flex items-center justify-between text-sm">
-                <span>API Rate Limit</span>
+                <span>Download Limit</span>
                 <div>
                   {storedRateInfo?.remainingRequests ||
                     videoInfo?.remainingRequests ||
