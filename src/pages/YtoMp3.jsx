@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Youtube,
   Link,
@@ -12,14 +12,25 @@ import Layout from "../components/Layout";
 import StatusCard from "../components/StatusCard";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { LiveTimer } from "../utils/utils";
 
 const YToMP3 = () => {
   const [url, setUrl] = useState("");
   const [status, setStatus] = useState("idle");
   const [errorMessage, setErrorMessage] = useState("");
   const [videoInfo, setVideoInfo] = useState(null);
+  const [time, setTime] = useState({
+    days: 0,
+    hours: 0,
+    minutes: 0,
+    seconds: 0,
+  });
   const storedRateInfo = JSON.parse(localStorage.getItem("rateInfo"));
 
+  useEffect(() => {
+    const stopTimer = LiveTimer(storedRateInfo?.resetTime, setTime);
+    return () => stopTimer(); // cleanup on unmount
+  }, [storedRateInfo?.resetTime]);
 
   const isValidYouTubeUrl = (url) => {
     const youtubeRegex =
@@ -81,8 +92,6 @@ const YToMP3 = () => {
       };
 
       localStorage.setItem("rateInfo", JSON.stringify(rateInfo));
-      
-
 
       // setVideoInfo((prev) => ({
       //   ...prev,
@@ -94,9 +103,9 @@ const YToMP3 = () => {
         setErrorMessage(data.message || "Failed to fetch video information.");
         return;
       }
-      setVideoInfo ({
+      setVideoInfo({
         title: data.title || "Unknown Title",
-        duration: data.duration || "Unknown Duration",
+        duration: data.lengthSeconds || "0.00",
         linkDownload: data.linkDownload || "",
         ...rateInfo,
       });
@@ -183,8 +192,13 @@ const YToMP3 = () => {
                     {videoInfo?.title}
                   </h3>
                   <p className="text-sm text-slate-400 mt-1">
-                    Duration:{" "}
-                    {videoInfo?.duration || "Unknown"}
+                    Duration: {
+                      videoInfo?.duration
+                        ? new Date(videoInfo.duration * 1000)
+                            .toISOString()
+                            .substr(11, 8)
+                        : "Unknown"
+                    }
                   </p>
                   {/* <button
                     onClick={handlePlayPause}
@@ -210,7 +224,7 @@ const YToMP3 = () => {
               className="mt-6 w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition-all duration-300 transform hover:scale-105"
             >
               <Download className="w-5 h-5" />
-              Download MP3 {videoInfo.rateLimit}
+              Download MP3
             </button>
           </div>
         );
@@ -288,13 +302,18 @@ const YToMP3 = () => {
             </form>
 
             {/* API Rate Limit */}
-             
+
             <div className="space-y-2 mt-6 bg-slate-700/50 border border-slate-600 rounded-lg p-4">
               <div className="flex items-center justify-between text-sm">
                 <span>API Rate Limit</span>
-                <div >
-                { storedRateInfo?.remainingRequests || videoInfo?.remainingRequests || "Unknown"  }/{ storedRateInfo?.rateLimit || videoInfo?.rateLimit || "Unknown" }
-
+                <div>
+                  {storedRateInfo?.remainingRequests ||
+                    videoInfo?.remainingRequests ||
+                    "Unknown"}
+                  /
+                  {storedRateInfo?.rateLimit ||
+                    videoInfo?.rateLimit ||
+                    "Unknown"}
                 </div>
               </div>
               <div className="w-full bg-gray-200 rounded-full h-2">
@@ -310,16 +329,14 @@ const YToMP3 = () => {
                 />
               </div>
 
-              <p className="text-xs text-muted-foreground">Resets in  {
-                  storedRateInfo?.resetTime ||
-                  videoInfo?.resetTime || "Unknown"
-                } minutes
-                </p>
-                <p className="text-xs">
-                Your current API rate limit status is displayed. This helps
-                you track your usage and avoid hitting the limits.
+              <p className="text-xs text-muted-foreground">
+                Resets in {time.days}d {time.hours}h {time.minutes}m{" "}
+                {time.seconds}s
               </p>
-
+              <p className="text-xs">
+                Your current API rate limit status is displayed. This helps you
+                track your usage and avoid hitting the limits.
+              </p>
             </div>
           </div>
 

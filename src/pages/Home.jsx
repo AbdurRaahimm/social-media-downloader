@@ -50,6 +50,7 @@ export default function Home() {
         toast.error('Too many requests, please try again later');
       }
       setLoading(false);
+      return; // Ensure the function exits after handling the error
     }
   };
   return (
