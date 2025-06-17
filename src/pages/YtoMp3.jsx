@@ -28,10 +28,10 @@ const YToMP3 = () => {
     minutes: 0,
     seconds: 0,
   });
-  const storedRateInfo = JSON.parse(localStorage.getItem("rateInfo"));
+  const storedRateInfo = JSON.parse(localStorage.getItem("rateInfo") || "{}");
 
   useEffect(() => {
-    const stopTimer = LiveTimer(storedRateInfo?.resetTime, setTime);
+    const stopTimer = LiveTimer(storedRateInfo?.resetTime || 0, setTime);
     return () => stopTimer(); // cleanup on unmount
   }, [storedRateInfo?.resetTime]);
 
