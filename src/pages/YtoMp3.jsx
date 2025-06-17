@@ -7,19 +7,19 @@ import {
   AlertTriangle,
   Music,
   X,
-  Play,
-  Pause,
 } from "lucide-react";
 import Layout from "../components/Layout";
 import StatusCard from "../components/StatusCard";
-import axios from 'axios';
-import { toast } from 'react-toastify';
+import axios from "axios";
+import { toast } from "react-toastify";
 
 const YToMP3 = () => {
   const [url, setUrl] = useState("");
   const [status, setStatus] = useState("idle");
   const [errorMessage, setErrorMessage] = useState("");
   const [videoInfo, setVideoInfo] = useState(null);
+  const storedRateInfo = JSON.parse(localStorage.getItem("rateInfo"));
+
 
   const isValidYouTubeUrl = (url) => {
     const youtubeRegex =
@@ -27,7 +27,7 @@ const YToMP3 = () => {
     return youtubeRegex.test(url);
   };
 
-  const handleSubmit = async(e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!url) {
       setStatus("error");
@@ -43,7 +43,7 @@ const YToMP3 = () => {
       return;
     }
 
-    // id extract 
+    // id extract
     const id = url.split("v=")[1]?.split("&")[0];
     if (!id) {
       setStatus("error");
@@ -56,44 +56,67 @@ const YToMP3 = () => {
     setErrorMessage("");
     const ApiUrl = import.meta.env.VITE_MP3_API_URL;
     const options = {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'x-rapidapi-key': import.meta.env.VITE_API_KEY,
-        'x-rapidapi-host': 'youtube-mp3-2025.p.rapidapi.com',
-        'Content-Type': 'application/json'
+        "x-rapidapi-key": import.meta.env.VITE_API_KEY,
+        "x-rapidapi-host": "youtube-mp3-2025.p.rapidapi.com",
+        "Content-Type": "application/json",
       },
-      body: {id: id}
-    }
+      body: { id: id },
+    };
     try {
       const response = await axios.post(ApiUrl, { url }, options);
-      console.log(response)
+      console.log(response);
       const data = response.data;
+      const headers = response.headers;
+
+      const limit = headers["x-ratelimit-requests-limit"];
+      const remaining = headers["x-ratelimit-requests-remaining"];
+      const reset = headers["x-ratelimit-requests-reset"];
+
+      const rateInfo = {
+        rateLimit: limit || "Unknown",
+        remainingRequests: remaining || "Unknown",
+        resetTime: reset || "Unknown",
+      };
+
+      localStorage.setItem("rateInfo", JSON.stringify(rateInfo));
+      
+
+
+      // setVideoInfo((prev) => ({
+      //   ...prev,
+      //   ...rateInfo,
+      // }));
+
       if (data.status === "error") {
         setStatus("error");
         setErrorMessage(data.message || "Failed to fetch video information.");
         return;
       }
-      setVideoInfo({
+      setVideoInfo ({
         title: data.title || "Unknown Title",
-        duration: data.lengthSeconds || "0:00",
+        duration: data.duration || "Unknown Duration",
         linkDownload: data.linkDownload || "",
+        ...rateInfo,
       });
 
       setStatus("success");
-      toast.success("Video converted successfully! You can now download the MP3 file.");
-
-  
-     } catch (error) {
-        console.error( error);
-        setStatus("error");
-        setErrorMessage(error.response?.data?.message || "An error occurred while processing your request. Please try again later.");
-        toast.error(error.response?.data?.message || "An error occurred while processing your request. Please try again later.");
-      }
-      
-     
-   
-
-
+      toast.success(
+        "Video converted successfully! You can now download the MP3 file."
+      );
+    } catch (error) {
+      console.error(error);
+      setStatus("error");
+      setErrorMessage(
+        error.response?.data?.message ||
+          "An error occurred while processing your request. Please try again later."
+      );
+      toast.error(
+        error.response?.data?.message ||
+          "An error occurred while processing your request. Please try again later."
+      );
+    }
     // setTimeout(() => {
     //   setVideoInfo({
     //     title: "Journey - Don't Stop Believin' (Official Audio)",
@@ -121,21 +144,20 @@ const YToMP3 = () => {
     } else {
       toast.error("No download link available. Please try converting again.");
     }
-  }
+  };
 
-  const handlePlayPause = () => {
-    if (videoInfo?.linkDownload) {
-      const audio = new Audio(videoInfo.linkDownload);
-      if (audio.paused) {
-        audio.play();
-      } else {
-        audio.pause();
-      }
-    } else {
-      toast.error("No audio available to play. Please convert a video first.");
-    }
-   
-  }
+  // const handlePlayPause = () => {
+  //   if (videoInfo?.linkDownload) {
+  //     const audio = new Audio(videoInfo.linkDownload);
+  //     if (audio.paused) {
+  //       audio.play();
+  //     } else {
+  //       audio.pause();
+  //     }
+  //   } else {
+  //     toast.error("No audio available to play. Please convert a video first.");
+  //   }
+  // };
 
   const renderStatusContent = () => {
     switch (status) {
@@ -154,28 +176,26 @@ const YToMP3 = () => {
             <div className="flex items-start justify-between">
               <div className="flex items-start gap-4">
                 <div className="bg-slate-700 border-2 border-dashed border-slate-600 rounded-lg w-24 h-24 flex-shrink-0 flex items-center justify-center">
-                  
-                <Music className="w-12 h-12 text-slate-300 cursor-pointer hover:text-slate-100 transition-colors" />
-                                  
+                  <Music className="w-12 h-12 text-slate-300 cursor-pointer hover:text-slate-100 transition-colors" />
                 </div>
                 <div>
                   <h3 className="font-bold text-lg text-slate-100 leading-tight">
                     {videoInfo?.title}
                   </h3>
                   <p className="text-sm text-slate-400 mt-1">
-                    Duration: {
-                      videoInfo?.duration
-                        ? new Date(videoInfo?.duration * 1000)
-                            .toISOString()
-                            .substr(11, 8)
-                        : "Unknown"
-                    }
+                    Duration:{" "}
+                    {videoInfo?.duration || "Unknown"}
                   </p>
-                  <button onClick={handlePlayPause} className="mt-2 text-indigo-400 hover:text-indigo-300 transition-colors font-semibold ">
+                  {/* <button
+                    onClick={handlePlayPause}
+                    className="mt-2 text-indigo-400 hover:text-indigo-300 transition-colors font-semibold "
+                  >
                     {videoInfo?.linkDownload ? (
                       <Play className="w-5 h-5 inline-block" />
-                    ) : <Pause />}
-                  </button>
+                    ) : (
+                      <Pause />
+                    )}
+                  </button> */}
                 </div>
               </div>
               <button
@@ -185,9 +205,12 @@ const YToMP3 = () => {
                 <X className="w-5 h-5" />
               </button>
             </div>
-            <button onClick={handleDownload} className="mt-6 w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition-all duration-300 transform hover:scale-105">
+            <button
+              onClick={handleDownload}
+              className="mt-6 w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition-all duration-300 transform hover:scale-105"
+            >
               <Download className="w-5 h-5" />
-              Download MP3
+              Download MP3 {videoInfo.rateLimit}
             </button>
           </div>
         );
@@ -263,6 +286,41 @@ const YToMP3 = () => {
                 {status === "loading" ? "Converting..." : "Convert"}
               </button>
             </form>
+
+            {/* API Rate Limit */}
+             
+            <div className="space-y-2 mt-6 bg-slate-700/50 border border-slate-600 rounded-lg p-4">
+              <div className="flex items-center justify-between text-sm">
+                <span>API Rate Limit</span>
+                <div >
+                { storedRateInfo?.remainingRequests || videoInfo?.remainingRequests || "Unknown"  }/{ storedRateInfo?.rateLimit || videoInfo?.rateLimit || "Unknown" }
+
+                </div>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-2">
+                <div
+                  className="h-2 rounded-full bg-indigo-500"
+                  style={{
+                    width: `${
+                      (storedRateInfo?.remainingRequests /
+                        storedRateInfo?.rateLimit) *
+                      100
+                    }%`,
+                  }}
+                />
+              </div>
+
+              <p className="text-xs text-muted-foreground">Resets in  {
+                  storedRateInfo?.resetTime ||
+                  videoInfo?.resetTime || "Unknown"
+                } minutes
+                </p>
+                <p className="text-xs">
+                Your current API rate limit status is displayed. This helps
+                you track your usage and avoid hitting the limits.
+              </p>
+
+            </div>
           </div>
 
           <div className="mt-8 min-h-[150px]">{renderStatusContent()}</div>
