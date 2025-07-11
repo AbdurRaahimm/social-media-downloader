@@ -1,5 +1,8 @@
 # Social Media Video Downloader
 This is a simple social media video downloader. It can download videos from Facebook, Instagram, Tiktok, and YouTube. It is built with React, Vite, and Tailwind CSS.
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=AbdurRaahimm/social-media-downloader&type=Date)](https://www.star-history.com/#AbdurRaahimm/social-media-downloader&Date)
 
 ## Usage
 1. Clone this repository
