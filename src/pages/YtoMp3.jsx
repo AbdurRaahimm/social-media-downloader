@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   Youtube,
   Link,
@@ -7,14 +7,13 @@ import {
   AlertTriangle,
   Music,
   X,
-  Play,
   Pause,
 } from "lucide-react";
 import Layout from "../components/Layout";
 import StatusCard from "../components/StatusCard";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { LiveTimer } from "../utils/utils";
+
 
 const YToMP3 = () => {
   const [url, setUrl] = useState("");
@@ -22,18 +21,8 @@ const YToMP3 = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [videoInfo, setVideoInfo] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [time, setTime] = useState({
-    days: 0,
-    hours: 0,
-    minutes: 0,
-    seconds: 0,
-  });
-  const storedRateInfo = JSON.parse(localStorage.getItem("rateInfo") || "{}");
+  
 
-  useEffect(() => {
-    const stopTimer = LiveTimer(storedRateInfo?.resetTime || 0, setTime);
-    return () => stopTimer(); // cleanup on unmount
-  }, [storedRateInfo?.resetTime]);
 
   const isValidYouTubeUrl = (url) => {
     const youtubeRegex =
@@ -164,8 +153,7 @@ const YToMP3 = () => {
       if (isPlaying) {
         audio.pause();
       } else {
-        audio.play()
-        
+        audio.play();
       }
       setIsPlaying((prev) => !prev);
     }
@@ -195,35 +183,34 @@ const YToMP3 = () => {
                     {videoInfo?.title}
                   </h3>
                   <p className="text-sm text-slate-400 mt-1">
-                    Duration: {
-                      videoInfo?.duration
-                        ? new Date(videoInfo.duration * 1000)
-                            .toISOString()
-                            .substr(11, 8)
-                        : "Unknown"
-                    }
+                    Duration:{" "}
+                    {videoInfo?.duration
+                      ? new Date(videoInfo.duration * 1000)
+                          .toISOString()
+                          .substr(11, 8)
+                      : "Unknown"}
                   </p>
-                 
-                  {/* audio play/pause */} 
 
-                  {
-                    isPlaying ? (
-                      <button
-                        onClick={handlePlayPause}
-                        className="mt-2 text-slate-500 hover:text-slate-300 transition-colors"
-                      >
-                        <Pause className="w-5 h-5" />
-                      </button>
-                    ) : (
-                      <button
-                        onClick={handlePlayPause}
-                        className="mt-2 text-slate-500 hover:text-slate-300 transition-colors"
-                      >
-                        <Play className="w-5 h-5" />
-                      </button>
-                    )
-                  }
-                  
+                  {/* audio play/pause */}
+
+                  {isPlaying ? (
+                    <button
+                      onClick={handlePlayPause}
+                      className="mt-2 text-slate-500 hover:text-slate-300 transition-colors"
+                    >
+                      <Pause className="w-5 h-5" />
+                    </button>
+                  ) : (
+                    <>
+                      <audio controls controlsList="nodownload">
+                        <source
+                          src={videoInfo?.linkDownload}
+                          type="audio/mpeg"
+                        />
+                        Your browser does not support the audio element
+                      </audio>
+                    </>
+                  )}
                 </div>
               </div>
               <button
@@ -316,16 +303,19 @@ const YToMP3 = () => {
             </form>
 
             {/* Download Limit */}
-
+         
+        {
+           videoInfo && (
+            <>
             <div className="space-y-2 mt-6 bg-slate-700/50 border border-slate-600 rounded-lg p-4">
               <div className="flex items-center justify-between text-sm">
                 <span>Download Limit</span>
                 <div>
-                  {storedRateInfo?.remainingRequests ||
+                  {videoInfo?.remainingRequests ||
                     videoInfo?.remainingRequests ||
                     "Unknown"}
                   /
-                  {storedRateInfo?.rateLimit ||
+                  {videoInfo?.rateLimit ||
                     videoInfo?.rateLimit ||
                     "Unknown"}
                 </div>
@@ -335,23 +325,25 @@ const YToMP3 = () => {
                   className="h-2 rounded-full bg-indigo-500"
                   style={{
                     width: `${
-                      (storedRateInfo?.remainingRequests /
-                        storedRateInfo?.rateLimit) *
+                      (videoInfo?.remainingRequests /
+                        videoInfo?.rateLimit) *
                       100
                     }%`,
                   }}
                 />
               </div>
 
-              <p className="text-xs text-muted-foreground">
-                Resets in {time.days}d {time.hours}h {time.minutes}m{" "}
-                {time.seconds}s
-              </p>
+             
               <p className="text-xs">
                 Your current API rate limit status is displayed. This helps you
                 track your usage and avoid hitting the limits.
               </p>
             </div>
+            </>
+           )
+        }
+             
+
           </div>
 
           <div className="mt-8 min-h-[150px]">{renderStatusContent()}</div>
