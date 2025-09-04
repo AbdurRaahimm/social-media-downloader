@@ -1,15 +1,13 @@
-import React from 'react'
-import Navber from './Navber'
-import Footer from './Footer'
+import Navbar from "./Navbar";
+import Footer from "./Footer";
 
+// eslint-disable-next-line react/prop-types
 export default function Layout({ children }) {
   return (
     <>
-      <Navber />
-      <main>
-        {children}
-      </main>
+      <Navbar />
+      <main>{children}</main>
       <Footer />
     </>
-  )
+  );
 }

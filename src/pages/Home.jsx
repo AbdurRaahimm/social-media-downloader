@@ -80,7 +80,7 @@ export default function Home() {
             </p>
           </header>
 
-          <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-6 shadow-2xl shadow-slate-950/50 backdrop-blur-sm">
+          <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-4 pt-0 shadow-2xl shadow-slate-950/50 backdrop-blur-sm">
             <form onSubmit={downloadMedia}>
               <label
                 htmlFor="youtube-url"

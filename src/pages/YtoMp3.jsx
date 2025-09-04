@@ -253,7 +253,7 @@ const YToMP3 = () => {
 
   return (
     <Layout>
-      <main className="bg-slate-900 flex flex-col items-center justify-center min-h-screen p-4 font-sans text-white">
+      <div className="bg-slate-900 flex flex-col items-center justify-center min-h-screen p-4 pt-20 font-sans text-white">
         <div className="w-full max-w-2xl mx-auto">
           <header className="text-center mb-8">
             <div className="inline-flex items-center justify-center gap-3 mb-4">
@@ -357,7 +357,7 @@ const YToMP3 = () => {
             stored.
           </p>
         </footer>
-      </main>
+      </div>
     </Layout>
   );
 };
