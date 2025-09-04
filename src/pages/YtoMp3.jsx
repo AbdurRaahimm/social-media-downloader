@@ -348,15 +348,12 @@ const YToMP3 = () => {
 
           <div className="mt-8 min-h-[150px]">{renderStatusContent()}</div>
         </div>
-        <footer className="text-center mt-12 text-slate-500 text-sm">
+        <div className="text-center mt-12 text-slate-500 text-sm">
           <p>
             &copy; {new Date().getFullYear()} YT to MP3. All rights reserved.
           </p>
-          <p className="mt-1">
-            This is a frontend demonstration. No actual files are processed or
-            stored.
-          </p>
-        </footer>
+          
+        </div>
       </div>
     </Layout>
   );

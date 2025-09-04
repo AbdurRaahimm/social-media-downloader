@@ -161,12 +161,12 @@ export default function Home() {
               ))}
           </div>
         </div>
-        <footer className="text-center mt-12 text-slate-500 text-sm">
+        <div className="text-center mt-12 text-slate-500 text-sm">
           <p>
             &copy; {new Date().getFullYear()} Social Media Downloader. All
             rights reserved.
           </p>
-        </footer>
+        </div>
       </main>
     </Layout>
   );
