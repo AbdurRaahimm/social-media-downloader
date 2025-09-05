@@ -1,14 +1,52 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import Layout from "../components/Layout";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { Download, Link, Loader, Share2 } from "lucide-react";
+import "../components/placeholder-animation.css";
+
+const socialMediaSites = [
+  "https://www.youtube.com/watch?v=...",
+  "https://www.facebook.com/watch?v=...",
+  "https://www.instagram.com/p/...",
+  "https://www.tiktok.com/@user/video/...",
+];
 
 export default function Home() {
   const [mediaData, setMediaData] = useState();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [url, setUrl] = useState("");
+  const [placeholder, setPlaceholder] = useState(socialMediaSites[0]);
+  const placeholderRef = useRef(null);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (placeholderRef.current) {
+        placeholderRef.current.classList.add("placeholder-slide-out");
+      }
+
+      setTimeout(() => {
+        setPlaceholder((prevPlaceholder) => {
+          const currentIndex = socialMediaSites.indexOf(prevPlaceholder);
+          const nextIndex = (currentIndex + 1) % socialMediaSites.length;
+          return socialMediaSites[nextIndex];
+        });
+        if (placeholderRef.current) {
+          placeholderRef.current.classList.remove("placeholder-slide-out");
+          placeholderRef.current.classList.add("placeholder-slide-in");
+        }
+      }, 500); // Half of the interval time
+
+      setTimeout(() => {
+        if (placeholderRef.current) {
+          placeholderRef.current.classList.remove("placeholder-slide-in");
+        }
+      }, 1000); // A bit less than the full interval
+    }, 2000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   const downloadMedia = async (e) => {
     e.preventDefault();
@@ -65,7 +103,7 @@ export default function Home() {
   };
   return (
     <Layout>
-      <main className="bg-slate-900 flex flex-col items-center justify-center min-h-screen p-4 font-sans text-white">
+      <main className="bg-slate-900 flex flex-col items-center justify-center min-h-screen p-4 pt-16 font-sans text-white">
         <div className="w-full max-w-2xl mx-auto">
           <header className="text-center mb-8">
             <div className="inline-flex items-center justify-center gap-3 mb-4">
@@ -80,7 +118,7 @@ export default function Home() {
             </p>
           </header>
 
-          <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-4 pt-0 shadow-2xl shadow-slate-950/50 backdrop-blur-sm">
+          <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-6 shadow-2xl shadow-slate-950/50 backdrop-blur-sm">
             <form onSubmit={downloadMedia}>
               <label
                 htmlFor="youtube-url"
@@ -88,17 +126,22 @@ export default function Home() {
               >
                 Video URL
               </label>
-              <div className="relative flex items-center">
-                <Link className="absolute left-4 w-5 h-5 text-slate-500 pointer-events-none" />
+              <div className="relative flex items-center placeholder-container">
+                <Link className="absolute left-4 w-5 h-5 text-slate-500 pointer-events-none z-10" />
                 <input
                   type="text"
                   id="youtube-url"
                   value={url}
                   onChange={(e) => setUrl(e.target.value)}
-                  placeholder="https://www.youtube.com/watch?v=..."
+                  placeholder={url ? "" : placeholder}
                   className="w-full bg-slate-900/70 border border-slate-700 text-slate-100 rounded-lg pl-12 pr-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-colors duration-300"
                   disabled={loading}
                 />
+                {!url && (
+                  <div ref={placeholderRef} className="placeholder-text">
+                    {placeholder}
+                  </div>
+                )}
               </div>
               <button
                 type="submit"
