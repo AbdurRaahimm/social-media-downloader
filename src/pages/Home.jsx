@@ -4,6 +4,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { Download, Link, Loader, Share2 } from "lucide-react";
 import "../components/placeholder-animation.css";
+import FeedbackButton from "../components/FeedbackButton";
 
 const socialMediaSites = [
   "https://www.youtube.com/watch?v=...",
@@ -204,6 +205,7 @@ export default function Home() {
               ))}
           </div>
         </div>
+        <FeedbackButton />
         <div className="text-center mt-12 text-slate-500 text-sm">
           <p>
             &copy; {new Date().getFullYear()} Social Media Downloader. All

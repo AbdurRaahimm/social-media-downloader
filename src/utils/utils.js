@@ -26,6 +26,17 @@ export function formatTime(totalSeconds) {
       remainingSeconds--;
     }, 1000);
   
-    return () => clearInterval(timer); // Return a cleanup function to stop the timer
+    return () => clearInterval(timer); 
   }
+
+export async function saveToSheet(data) {
+    const response = await fetch(import.meta.env.VITE_GOOGLE_SHEET_URL, {
+        method: 'POST',
+        body: JSON.stringify(data),
+        // headers: {
+        //     'Content-Type': 'application/json',
+        // },
+    });
+    return response.text();
+}
   
